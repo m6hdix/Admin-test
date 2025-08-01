@@ -178,9 +178,9 @@ contract MehdiJetton with Deployable {
 
     }
     
-    // Mint new tokens (admin only)
+    // Mint new jettons (admin only)
     receive(msg: Mint) {
-        require(sender() == self.adminAddress, "Only admin can mint tokens");
+        require(sender() == self.adminAddress, "Only admin can mint jettons");
         
         self.totalSupply = self.totalSupply + msg.amount;
         let currentBalanceOpt = self.balances.get(msg.to);
@@ -252,7 +252,7 @@ contract MehdiJetton with Deployable {
         self.internalTransfer(msg.from, myAddress(), msg.amount);
     }
     
-    // Transfer tokens between users
+    // Transfer jettons between users
     receive(msg: Transfer) {
         self.internalTransfer(sender(), msg.to, msg.amount);
         

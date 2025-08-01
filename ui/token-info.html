@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اطلاعات جتون مهدی</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-4">
+    <div class="max-w-md mx-auto">
+        <div class="bg-gray-800 rounded-lg p-6 shadow-xl">
+            <h1 class="text-2xl font-bold text-center mb-6 text-purple-400">🪙 جتون مهدی</h1>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold mb-2 text-yellow-400">📊 اطلاعات قرارداد</h2>
+                    <div class="text-sm space-y-1">
+                        <p><strong>آدرس قرارداد:</strong></p>
+                        <p class="bg-gray-600 p-2 rounded text-xs break-all font-mono">EQAZpB3OQZgc3PnUKh4aTdGoi5sWUvzQF7tM3ckfn66cmoeZ</p>
+                        <p><strong>نام جتون:</strong> Mehdi Jetton</p>
+                        <p><strong>نماد:</strong> MEHDI</p>
+                        <p><strong>شبکه:</strong> Testnet</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold mb-2 text-green-400">💰 موجودی شما</h2>
+                    <p class="text-2xl font-bold">1,000,000 MEHDI</p>
+                    <p class="text-sm text-gray-300">جتون‌های شما با موفقیت ارسال شده‌اند!</p>
+                </div>
+
+                <div class="bg-blue-900 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold mb-2 text-blue-300">📱 افزودن به کیف پول</h2>
+                    <p class="text-sm mb-3">برای دیدن جتون در کیف پول، باید آن را به صورت دستی اضافه کنید:</p>
+                    
+                    <div class="space-y-2">
+                        <button onclick="copyAddress()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded transition">
+                            📋 کپی آدرس قرارداد
+                        </button>
+                        
+                        <a href="https://testnet.tonscan.org/address/EQAZpB3OQZgc3PnUKh4aTdGoi5sWUvzQF7tM3ckfn66cmoeZ" 
+                           target="_blank" 
+                           class="block w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded text-center transition">
+                            🔍 بررسی در Tonscan
+                        </a>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-900 rounded-lg p-4">
+                    <h3 class="font-semibold mb-2 text-yellow-300">📝 راهنمای سریع:</h3>
+                    <ol class="text-sm space-y-1 list-decimal list-inside">
+                        <li>به کیف پول TON خود بروید</li>
+                        <li>گزینه "افزودن جتون سفارشی" را پیدا کنید</li>
+                        <li>آدرس قرارداد را وارد کنید</li>
+                        <li>اطلاعات توکن به صورت خودکار پر می‌شود</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyAddress() {
+            const address = 'EQAZpB3OQZgc3PnUKh4aTdGoi5sWUvzQF7tM3ckfn66cmoeZ';
+            navigator.clipboard.writeText(address).then(() => {
+                alert('آدرس قرارداد کپی شد!');
+            });
+        }
+    </script>
+</body>
+</html>

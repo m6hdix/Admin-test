@@ -172,7 +172,7 @@ describe('MehdiJetton', () => {
     });
 
     it('should apply whitelisted user fee exemption', async () => {
-        // Mint tokens to user1
+        // Mint jettons to user1
         await mehdiJetton.send(
             deployer.getSender(),
             {
@@ -293,8 +293,8 @@ describe('MehdiJetton', () => {
         });
     });
 
-    it('should handle token transfers correctly', async () => {
-        // Mint tokens to user1
+    it('should handle jetton transfers correctly', async () => {
+        // Mint jettons to user1
         await mehdiJetton.send(
             deployer.getSender(),
             {

@@ -3,14 +3,10 @@ let tonweb;
 let contract;
 let walletConnection;
 let userAddress;
-let contractAddress = null; // Will be set after deployment
+let contractAddress = "EQC..."; // Replace with your deployed contract address
 
 // Initialize TON Web
-try {
     tonweb = new TonWeb();
-} catch (e) {
-    console.warn('TON Web not available, running in demo mode');
-}
 
 // DOM Elements
 const connectWalletBtn = document.getElementById('connect-wallet');
@@ -32,20 +28,15 @@ async function connectWallet() {
                 connectWalletBtn.classList.add('hidden');
                 if (dashboard) dashboard.classList.remove('hidden');
                 
+                // Initialize contract with wallet
+                await initializeContract();
+                
                 // Load initial data
                 await loadContractData();
                 await loadUserData();
             }
         } else {
-            // Fallback for demo
-            userAddress = 'UQDemoAddress123456789';
-            walletAddressSpan.textContent = shortenAddress(userAddress);
-            walletInfo.classList.remove('hidden');
-            connectWalletBtn.classList.add('hidden');
-            if (dashboard) dashboard.classList.remove('hidden');
-            
-            // Load demo data
-            loadDemoData();
+            alert('TON Connect UI not available. Please install a TON wallet extension.');
         }
     } catch (error) {
         console.error('Failed to connect wallet:', error);
@@ -55,12 +46,82 @@ async function connectWallet() {
 
 function disconnectWallet() {
     userAddress = null;
+    contract = null;
     walletInfo.classList.add('hidden');
     connectWalletBtn.classList.remove('hidden');
     if (dashboard) dashboard.classList.add('hidden');
     
     if (window.tonConnectUI) {
         window.tonConnectUI.disconnect();
+    }
+}
+
+// Contract Initialization
+async function initializeContract() {
+    if (!contractAddress || !userAddress) return;
+    
+    try {
+        const wallet = window.tonConnectUI.wallet;
+        if (!wallet) throw new Error('Wallet not connected');
+        
+        // Initialize contract with TON Web
+        const provider = tonweb.provider;
+        const keyPair = await tonweb.getKeyPairFromSeed(wallet.account.publicKey);
+        
+        // Create contract instance
+        contract = new tonweb.Contract(provider, {
+            address: contractAddress,
+            abi: {
+                types: [
+                    { name: 'Transfer', type: 'struct', fields: [
+                        { name: 'to', type: 'address' },
+                        { name: 'amount', type: 'uint128' },
+                        { name: 'responseAddress', type: 'address' }
+                    ]},
+                    { name: 'Mint', type: 'struct', fields: [
+                        { name: 'to', type: 'address' },
+                        { name: 'amount', type: 'uint128' }
+                    ]},
+                    { name: 'ToggleTransfers', type: 'struct', fields: []},
+                    { name: 'SetFee', type: 'struct', fields: [
+                        { name: 'feePercentage', type: 'uint32' }
+                    ]},
+                    { name: 'SetFeeCollector', type: 'struct', fields: [
+                        { name: 'collector', type: 'address' }
+                    ]},
+                    { name: 'SetUserPermissions', type: 'struct', fields: [
+                        { name: 'user', type: 'address' },
+                        { name: 'canTransfer', type: 'bool' },
+                        { name: 'isWhitelisted', type: 'bool' },
+                        { name: 'customFee', type: 'uint32' }
+                    ]}
+                ],
+                getters: [
+                    { name: 'get_total_supply', inputs: [], outputs: [{ name: 'totalSupply', type: 'uint128' }] },
+                    { name: 'get_user_balance', inputs: [{ name: 'user', type: 'address' }], outputs: [{ name: 'balance', type: 'uint128' }] },
+                    { name: 'get_transfer_enabled', inputs: [], outputs: [{ name: 'enabled', type: 'bool' }] },
+                    { name: 'get_fee_percentage', inputs: [], outputs: [{ name: 'fee', type: 'uint32' }] },
+                    { name: 'get_user_permissions', inputs: [{ name: 'user', type: 'address' }], outputs: [
+                        { name: 'canTransfer', type: 'bool' },
+                        { name: 'isWhitelisted', type: 'bool' },
+                        { name: 'customFee', type: 'uint32' }
+                    ]}
+                ],
+                messages: [
+                    { name: 'Transfer', inputs: [{ name: 'msg', type: 'Transfer' }] },
+                    { name: 'Mint', inputs: [{ name: 'msg', type: 'Mint' }] },
+                    { name: 'ToggleTransfers', inputs: [{ name: 'msg', type: 'ToggleTransfers' }] },
+                    { name: 'SetFee', inputs: [{ name: 'msg', type: 'SetFee' }] },
+                    { name: 'SetFeeCollector', inputs: [{ name: 'msg', type: 'SetFeeCollector' }] },
+                    { name: 'SetUserPermissions', inputs: [{ name: 'msg', type: 'SetUserPermissions' }] }
+                ]
+            }
+        });
+        
+        console.log('Contract initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize contract:', error);
+        alert('Failed to initialize contract: ' + error.message);
     }
 }
 
@@ -71,16 +132,23 @@ function shortenAddress(address) {
 
 // Contract Data Loading
 async function loadContractData() {
-    if (!contractAddress) {
-        console.warn('Contract address not set');
+    if (!contract || !contractAddress) {
+        console.warn('Contract not initialized');
         return;
     }
     
     try {
-        // This would be actual contract calls in production
-        const data = await getContractData();
+        const totalSupplyResult = await contract.methods.get_total_supply({});
+        const transferEnabledResult = await contract.methods.get_transfer_enabled({});
+        const feePercentageResult = await contract.methods.get_fee_percentage({});
+
+        const data = {
+            totalSupply: TonWeb.utils.fromNano(totalSupplyResult.totalSupply.toString()),
+            transferEnabled: transferEnabledResult.enabled,
+            feePercentage: feePercentageResult.fee.toString(),
+            feeCollector: contractAddress
+        };
         
-        // Update UI
         updateContractUI(data);
     } catch (error) {
         console.error('Failed to load contract data:', error);
@@ -88,31 +156,24 @@ async function loadContractData() {
 }
 
 async function loadUserData() {
-    if (!userAddress || !contractAddress) return;
+    if (!userAddress || !contract || !contractAddress) return;
     
     try {
-        const balance = await getUserBalance(userAddress);
-        document.getElementById('user-balance').textContent = formatAmount(balance);
+        const balanceResult = await contract.methods.get_user_balance({ user: userAddress });
+        const permissionsResult = await contract.methods.get_user_permissions({ user: userAddress });
         
-        const permissions = await getUserPermissions(userAddress);
-        updatePermissionsUI(permissions);
+        document.getElementById('user-balance').textContent = formatAmount(TonWeb.utils.fromNano(balanceResult.balance.toString()));
+        updatePermissionsUI({
+            canTransfer: permissionsResult.canTransfer,
+            isWhitelisted: permissionsResult.isWhitelisted,
+            customFee: permissionsResult.customFee.toString()
+        });
     } catch (error) {
         console.error('Failed to load user data:', error);
     }
 }
 
-// Demo Data Functions
-function loadDemoData() {
-    const demoData = {
-        totalSupply: '1000000',
-        transferEnabled: true,
-        feePercentage: 2,
-        feeCollector: 'UQCollector123456789'
-    };
-    
-    updateContractUI(demoData);
-    document.getElementById('user-balance').textContent = '1000';
-}
+
 
 function updateContractUI(data) {
     const totalSupplyEl = document.getElementById('total-supply') || document.getElementById('admin-total-supply');
@@ -192,7 +253,7 @@ if (transferForm) {
         }
         
         try {
-            await transferTokens(recipient, amount);
+            await transferJettons(recipient, amount);
             alert(`Successfully transferred ${amount} MEHDI to ${shortenAddress(recipient)}`);
             transferForm.reset();
             await loadUserData();
@@ -218,7 +279,7 @@ if (mintForm) {
         }
         
         try {
-            await mintTokens(recipient, amount);
+            await mintJettons(recipient, amount);
             alert(`Successfully minted ${amount} MEHDI to ${shortenAddress(recipient)}`);
             mintForm.reset();
             await loadContractData();
@@ -324,70 +385,151 @@ if (permissionsForm) {
     });
 }
 
-// Mock Contract Functions (Replace with actual contract calls)
-async function getContractData() {
-    // This would be actual contract calls
-    return {
-        totalSupply: '1000000',
-        transferEnabled: true,
-        feePercentage: 2,
-        feeCollector: 'UQCollector123456789'
-    };
+// Contract Interaction Functions
+async function transferJettons(recipient, amount) {
+    if (!contract || !userAddress) throw new Error('Contract not initialized');
+    
+    try {
+        const amountNano = TonWeb.utils.toNano(amount.toString());
+        
+        const result = await contract.methods.Transfer({
+            msg: {
+                to: recipient,
+                amount: amountNano,
+                responseAddress: userAddress
+            }
+        }).send({
+            from: userAddress,
+            amount: TonWeb.utils.toNano('0.05') // Gas fee
+        });
+        
+        console.log('Transfer successful:', result);
+        return result;
+    } catch (error) {
+        console.error('Transfer failed:', error);
+        throw error;
+    }
 }
 
-async function getUserBalance(address) {
-    // This would be actual contract calls
-    return '1000';
-}
-
-async function getUserPermissions(address) {
-    // This would be actual contract calls
-    return {
-        canTransfer: true,
-        isWhitelisted: false,
-        customFee: 0
-    };
-}
-
-async function transferTokens(recipient, amount) {
-    // This would be actual contract calls
-    console.log(`Transferring ${amount} MEHDI to ${recipient}`);
-    return { success: true };
-}
-
-async function mintTokens(recipient, amount) {
-    // This would be actual contract calls
-    console.log(`Minting ${amount} MEHDI to ${recipient}`);
-    return { success: true };
+async function mintJettons(recipient, amount) {
+    if (!contract || !userAddress) throw new Error('Contract not initialized');
+    
+    try {
+        const amountNano = TonWeb.utils.toNano(amount.toString());
+        
+        const result = await contract.methods.Mint({
+            msg: {
+                to: recipient,
+                amount: amountNano
+            }
+        }).send({
+            from: userAddress,
+            amount: TonWeb.utils.toNano('0.05') // Gas fee
+        });
+        
+        console.log('Mint successful:', result);
+        return result;
+    } catch (error) {
+        console.error('Mint failed:', error);
+        throw error;
+    }
 }
 
 async function setFee(newFee) {
-    // This would be actual contract calls
-    console.log(`Setting fee to ${newFee}%`);
-    return { success: true };
+    if (!contract || !userAddress) throw new Error('Contract not initialized');
+    
+    try {
+        const result = await contract.methods.SetFee({
+            msg: {
+                feePercentage: parseInt(newFee)
+            }
+        }).send({
+            from: userAddress,
+            amount: TonWeb.utils.toNano('0.05') // Gas fee
+        });
+        
+        console.log('Fee update successful:', result);
+        return result;
+    } catch (error) {
+        console.error('Fee update failed:', error);
+        throw error;
+    }
 }
 
 async function toggleTransfers() {
-    // This would be actual contract calls
-    console.log('Toggling transfers');
-    return { success: true };
+    if (!contract || !userAddress) throw new Error('Contract not initialized');
+    
+    try {
+        const result = await contract.methods.ToggleTransfers({
+            msg: {}
+        }).send({
+            from: userAddress,
+            amount: TonWeb.utils.toNano('0.05') // Gas fee
+        });
+        
+        console.log('Transfer toggle successful:', result);
+        return result;
+    } catch (error) {
+        console.error('Transfer toggle failed:', error);
+        throw error;
+    }
 }
 
 async function getTransferStatus() {
-    // This would be actual contract calls
-    return true;
+    if (!contract) throw new Error('Contract not initialized');
+    
+    try {
+        const result = await contract.methods.get_transfer_enabled({});
+        return result.enabled;
+    } catch (error) {
+        console.error('Failed to get transfer status:', error);
+        throw error;
+    }
 }
 
 async function setFeeCollector(newCollector) {
-    // This would be actual contract calls
-    console.log(`Setting fee collector to ${newCollector}`);
-    return { success: true };
+    if (!contract || !userAddress) throw new Error('Contract not initialized');
+    
+    try {
+        const result = await contract.methods.SetFeeCollector({
+            msg: {
+                collector: newCollector
+            }
+        }).send({
+            from: userAddress,
+            amount: TonWeb.utils.toNano('0.05') // Gas fee
+        });
+        
+        console.log('Fee collector update successful:', result);
+        return result;
+    } catch (error) {
+        console.error('Fee collector update failed:', error);
+        throw error;
+    }
 }
 
 async function setUserPermissions(userAddress, canTransfer, isWhitelisted, customFee) {
-    // This would be actual contract calls
-    console.log(`Setting permissions for ${userAddress}: transfer=${canTransfer}, whitelisted=${isWhitelisted}, customFee=${customFee}`);
-    return { success: true };
+    if (!contract || !userAddress) throw new Error('Contract not initialized');
+    
+    try {
+        const result = await contract.methods.SetUserPermissions({
+            msg: {
+                user: userAddress,
+                canTransfer: canTransfer,
+                isWhitelisted: isWhitelisted,
+                customFee: parseInt(customFee)
+            }
+        }).send({
+            from: userAddress,
+            amount: TonWeb.utils.toNano('0.05') // Gas fee
+        });
+        
+        console.log('User permissions update successful:', result);
+        return result;
+    } catch (error) {
+        console.error('User permissions update failed:', error);
+        throw error;
+    }
 }
 
 // Admin Log Functions
@@ -441,10 +583,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize TON Connect UI
     if (typeof TonConnectUI !== 'undefined') {
         window.tonConnectUI = new TonConnectUI({
-            manifestUrl: 'https://your-domain.com/tonconnect-manifest.json',
+            manifestUrl: 'http://localhost:3000/tonconnect-manifest.json',
             buttonRootId: 'connect-wallet'
         });
     }
+    
+    // Set deployed contract address
+    contractAddress = 'EQAZpB3OQZgc3PnUKh4aTdGoi5sWUvzQF7tM3ckfn66cmoeZ';
     
     // Load initial data
     if (userAddress) {

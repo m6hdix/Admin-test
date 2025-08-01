@@ -18,12 +18,12 @@ export async function run(provider: NetworkProvider) {
 
     await provider.waitForDeploy(mehdiJetton.address);
 
-    // Initialize with some tokens for testing
+    // Initialize with some jettons for testing
     console.log('Deploying MehdiJetton...');
     console.log('Contract address:', mehdiJetton.address.toString());
     console.log('Admin address:', provider.sender().address?.toString());
     
-    // Mint initial tokens to admin
+    // Mint initial jettons to admin
     await mehdiJetton.send(
         provider.sender(),
         {
@@ -32,10 +32,10 @@ export async function run(provider: NetworkProvider) {
         {
             $$type: 'Mint',
             to: provider.sender().address!!,
-            amount: toNano('1000000'), // 1M tokens
+            amount: toNano('1000000'), // 1M jettons
             responseAddress: provider.sender().address!!
         }
     );
     
-    console.log('Minted 1M Mehdi Jetton tokens to admin');
+    console.log('Minted 1M Mehdi Jetton jettons to admin');
 }

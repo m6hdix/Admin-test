@@ -1,6 +1,8 @@
 # Mehdi Jetton - Complete TON Jetton Management System
 
-A comprehensive TON blockchain jetton (token) management system built with Tact language, featuring advanced fee calculation, admin controls, user permissions, and a complete web interface.
+# Mehdi Jetton
+
+A comprehensive TON blockchain jetton management system built with Tact language, featuring advanced fee calculation, admin controls, user permissions, and a complete web interface.
 
 ## 🚀 Features
 
@@ -10,7 +12,7 @@ A comprehensive TON blockchain jetton (token) management system built with Tact 
 - **Transfer Toggle**: Enable/disable all transfers with admin command
 - **User Permissions**: Granular control over individual user permissions
 - **Whitelisting**: Exempt specific users from fees
-- **Minting**: Admin-only token minting functionality
+- **Minting**: Admin-only jetton minting functionality
 - **Event Logging**: Comprehensive event system for transparency
 
 ### Web Interface Features
@@ -101,8 +103,8 @@ mehdi-jetton/
 
 ### For Users
 1. **Connect Wallet**: Visit the UI and connect your TON wallet
-2. **View Balance**: Check your MEHDI token balance
-3. **Transfer Tokens**: Send tokens to other addresses
+2. **View Balance**: Check your MEHDI jetton balance
+3. **Transfer Jettons**: Send jettons to other addresses
 4. **Calculate Fees**: Use the built-in fee calculator
 5. **Track History**: View your transaction history
 
@@ -110,7 +112,7 @@ mehdi-jetton/
 1. **Access Admin Panel**: Navigate to admin.html
 2. **Connect Admin Wallet**: Use the admin wallet
 3. **Manage Contract**:
-   - **Mint Tokens**: Create new tokens
+   - **Mint Jettons**: Create new jettons
    - **Toggle Transfers**: Enable/disable all transfers
    - **Set Fee Rate**: Adjust transaction fees (0-10%)
    - **Manage Users**: Set individual user permissions
@@ -124,7 +126,7 @@ mehdi-jetton/
 - `SetFee(feePercentage: Int)` - Set global fee (0-10%)
 - `SetFeeCollector(newCollector: Address)` - Change fee collector
 - `SetUserPermissions(user: Address, canTransfer: Bool, isWhitelisted: Bool, customFee: Int)` - Set user permissions
-- `Mint(to: Address, amount: Int, responseAddress: Address)` - Mint new tokens
+- `Mint(to: Address, amount: Int, responseAddress: Address)` - Mint new jettons
 
 ### User Functions
 - `getBalance(user: Address)` - Get user balance
@@ -207,13 +209,13 @@ npm test MehdiJetton.spec.ts
 ### User Dashboard (`index.html`)
 - **Wallet Connection**: TON wallet integration
 - **Balance Display**: Real-time balance updates
-- **Transfer Form**: Easy token transfers
+- **Transfer Form**: Easy jetton transfers
 - **Fee Calculator**: Transfer fee estimation
 - **Transaction History**: Recent transactions
 
 ### Admin Panel (`admin.html`)
 - **Contract Overview**: Key metrics display
-- **Mint Tokens**: Create new tokens
+- **Mint Jettons**: Create new jettons
 - **Fee Management**: Adjust fee rates
 - **User Permissions**: Manage individual users
 - **Action Logging**: Track admin actions
