@@ -1,6 +1,5 @@
 import "@stdlib/deploy";
 import "@stdlib/ownable";
-import "@stdlib/content";
 
 struct JettonData {
     totalSupply: Int as coins;
@@ -73,13 +72,6 @@ message(0x12345678) Transfer {
 
 contract MehdiJetton with Deployable {
     
-    // Jetton metadata
-    name: String = "Mehdi Jetton";
-    symbol: String = "MEHDI";
-    description: String = "جتون مهدی - توکن رسمی پروژه مهدی با قابلیت انتقال و مدیریت کارمزد";
-    image_url: String = "https://raw.githubusercontent.com/mehdi-jetton/logo/main/logo.png";
-    decimals: Int = 9;
-    
     totalSupply: Int as coins = 0;
     adminAddress: Address;
     transferEnabled: Bool = true;
@@ -92,7 +84,12 @@ contract MehdiJetton with Deployable {
     // User balances
     balances: map<Address, Int as coins>;
     
-
+    // Jetton metadata
+    name: String = "Mehdi Jetton";
+    symbol: String = "MEHDI";
+    description: String = "جتون مهدی - توکن رسمی پروژه مهدی با قابلیت انتقال و مدیریت کارمزد";
+    image_url: String = "https://raw.githubusercontent.com/mehdi-jetton/logo/main/logo.png";
+    decimals: Int = 9;
     
     init(owner: Address) {
         self.adminAddress = owner;
@@ -117,15 +114,6 @@ contract MehdiJetton with Deployable {
         return (amount * feeRate) / 100;
     }
     
-    // Get user balance
-    get fun getBalance(user: Address): Int {
-        let balance = self.balances.get(user);
-        if (balance != null) {
-            return balance!!;
-        }
-        return 0;
-    }
-    
     // Get jetton info
     get fun getJettonData(): JettonData {
         return JettonData{
@@ -135,6 +123,15 @@ contract MehdiJetton with Deployable {
             feePercentage: self.feePercentage,
             feeCollector: self.feeCollector
         };
+    }
+    
+    // Get user balance
+    get fun getBalance(user: Address): Int {
+        let balance = self.balances.get(user);
+        if (balance != null) {
+            return balance!!;
+        }
+        return 0;
     }
     
     // Get user permissions
