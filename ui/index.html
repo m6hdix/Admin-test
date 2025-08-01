@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mehdi Jetton - User Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/tonweb@0.0.60/dist/tonweb.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Mehdi Jetton Dashboard
+            </h1>
+            <p class="text-center text-gray-400 mt-2">Manage your Mehdi Jetton tokens</p>
+        </header>
+
+        <!-- Wallet Connection -->
+        <div class="max-w-md mx-auto mb-8">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Connect Wallet</h2>
+                <div id="wallet-connection" class="text-center">
+                    <button id="connect-wallet" class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-medium transition">
+                        Connect TON Wallet
+                    </button>
+                    <div id="wallet-info" class="hidden mt-4">
+                        <p class="text-sm text-gray-400">Connected: <span id="wallet-address" class="text-white"></span></p>
+                        <button id="disconnect-wallet" class="text-red-400 hover:text-red-300 text-sm mt-2">Disconnect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard" class="hidden">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Balance Card -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4">Your Balance</h3>
+                    <div class="text-3xl font-bold text-purple-400">
+                        <span id="user-balance">0</span> MEHDI
+                    </div>
+                    <p class="text-sm text-gray-400 mt-2">Current token balance</p>
+                </div>
+
+                <!-- Jetton Info Card -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4">Jetton Info</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Total Supply:</span>
+                            <span id="total-supply" class="text-white">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Transfer Status:</span>
+                            <span id="transfer-status" class="text-green-400">Enabled</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Fee Rate:</span>
+                            <span id="fee-rate" class="text-white">2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transfer Section -->
+            <div class="mt-8 bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4">Transfer Tokens</h3>
+                <form id="transfer-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Recipient Address</label>
+                        <input type="text" id="recipient-address" 
+                               class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500"
+                               placeholder="Enter TON address">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Amount</label>
+                        <input type="number" id="transfer-amount" 
+                               class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500"
+                               placeholder="0" min="0" step="0.000001">
+                    </div>
+                    <div class="text-sm text-gray-400">
+                        Estimated Fee: <span id="estimated-fee">0</span> MEHDI
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-medium transition">
+                        Transfer Tokens
+                    </button>
+                </form>
+            </div>
+
+            <!-- Fee Calculator -->
+            <div class="mt-8 bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4">Fee Calculator</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Amount to Transfer</label>
+                        <input type="number" id="calc-amount" 
+                               class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500"
+                               placeholder="0" min="0" step="0.000001">
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="text-sm text-gray-400">Fee: <span id="calc-fee">0</span> MEHDI</div>
+                        <div class="text-sm text-gray-400">Net Amount: <span id="calc-net">0</span> MEHDI</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="mt-8 bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4">Recent Transactions</h3>
+                <div id="transaction-list" class="space-y-2">
+                    <p class="text-gray-400 text-center">No transactions yet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel Link -->
+        <div class="text-center mt-8">
+            <a href="admin.html" class="text-purple-400 hover:text-purple-300">
+                Go to Admin Panel →
+            </a>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

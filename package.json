@@ -1,15 +1,36 @@
 {
-    "name": "Test",
-    "version": "0.0.1",
+    "name": "mehdi-jetton",
+    "version": "1.0.0",
+    "description": "Complete TON Jetton Management System with fee calculation, admin controls, and user permissions",
+    "main": "index.js",
     "scripts": {
         "bp": "blueprint",
         "start": "blueprint run",
         "build": "blueprint build",
         "test": "jest --verbose",
+        "test:watch": "jest --watch",
+        "deploy": "blueprint run deploy",
+        "deploy:mainnet": "blueprint run deploy --mainnet",
+        "serve": "cd ui && python -m http.server 8000",
+        "dev": "concurrently \"npm run serve\" \"npm run test:watch\"",
         "release": "blueprint pack && npm publish --access public"
     },
+    "keywords": [
+        "ton",
+        "tact",
+        "jetton",
+        "token",
+        "defi",
+        "smart-contract",
+        "fee-calculation",
+        "admin-panel"
+    ],
+    "author": "Mehdi Jetton Team",
+    "license": "MIT",
     "dependencies": {
-        "@ton/core": "~0"
+        "@ton/core": "~0",
+        "@ton/ton": ">=15.2.1 <16.0.0",
+        "@ton/crypto": "^3.3.0"
     },
     "devDependencies": {
         "@ton/blueprint": ">=0.38.0",
@@ -19,13 +40,13 @@
         "@types/node": "^22.15.32",
         "jest": "^29.7.0",
         "prettier": "^3.5.3",
-        "@ton/ton": ">=15.2.1 <16.0.0",
-        "@ton/crypto": "^3.3.0",
         "ts-jest": "^29.4.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.8.3",
         "@ton/tolk-js": ">=1.0.0",
         "@tact-lang/compiler": ">=1.6.13 <2.0.0",
-        "@ton-community/func-js": ">=0.9.1"
+        "@ton-community/func-js": ">=0.9.1",
+        "concurrently": "^8.2.2",
+        "http-server": "^14.1.1"
     }
 }
