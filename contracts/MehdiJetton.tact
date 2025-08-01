@@ -218,8 +218,6 @@ contract MehdiJetton with Deployable {
         }
         self.balances.set(msg.to, currentBalance + msg.amount);
         
-
-        
         // Send notification to recipient
         send(SendParameters{
             to: msg.to,
