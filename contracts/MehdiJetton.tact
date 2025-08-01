@@ -1,5 +1,6 @@
 import "@stdlib/deploy";
 import "@stdlib/ownable";
+import "@stdlib/content";
 
 struct JettonData {
     totalSupply: Int as coins;
@@ -72,6 +73,13 @@ message(0x12345678) Transfer {
 
 contract MehdiJetton with Deployable {
     
+    // Jetton metadata
+    name: String = "Mehdi Jetton";
+    symbol: String = "MEHDI";
+    description: String = "جتون مهدی - توکن رسمی پروژه مهدی با قابلیت انتقال و مدیریت کارمزد";
+    image_url: String = "https://raw.githubusercontent.com/mehdi-jetton/logo/main/logo.png";
+    decimals: Int = 9;
+    
     totalSupply: Int as coins = 0;
     adminAddress: Address;
     transferEnabled: Bool = true;
@@ -141,6 +149,29 @@ contract MehdiJetton with Deployable {
             customFee: 0
         };
     }
+    
+    // Get jetton metadata
+    get fun getName(): String {
+        return self.name;
+    }
+    
+    get fun getSymbol(): String {
+        return self.symbol;
+    }
+    
+    get fun getDescription(): String {
+        return self.description;
+    }
+    
+    get fun getImageUrl(): String {
+        return self.image_url;
+    }
+    
+    get fun getDecimals(): Int {
+        return self.decimals;
+    }
+    
+
     
     // Admin functions
     receive(msg: ChangeAdmin) {
